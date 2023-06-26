@@ -1,0 +1,14 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: start;
+
+  > .title{
+    color: #F13E3E;
+  }
+
+  > .categories {
+    display: flex;
+  }
+}

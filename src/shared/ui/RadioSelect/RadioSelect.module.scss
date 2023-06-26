@@ -1,0 +1,22 @@
+.main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  > .item {
+    cursor: pointer;
+
+    padding: 5px;
+
+    background: unset;
+    border: unset;
+    border-radius: 4px;
+
+    transition: background .5s ease, color .5s ease ;
+
+    &.active {
+      color: white;
+      background-color: #F13E3E;
+    }
+  }
+}

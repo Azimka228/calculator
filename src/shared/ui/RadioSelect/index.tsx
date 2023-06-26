@@ -1,8 +1,6 @@
-"use client"
-
 import styles from "./RadioSelect.module.scss"
 
-import React, {FC, useEffect, useState} from "react"
+import {FC, useEffect, useState} from "react"
 
 import cn from "classnames"
 

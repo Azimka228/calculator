@@ -1,3 +1,3 @@
-export {Input} from "./Input"
-export {RadioSelect} from "./RadioSelect"
-export {Select} from "./Select"
+export {Input} from "./Input/index"
+export {RadioSelect} from "./RadioSelect/index"
+export {Select} from "./Select/index"

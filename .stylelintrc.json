@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "stylelint-config-prettier",
+    "stylelint-config-clean-order"
+  ],
+  "customSyntax": "postcss-scss",
+  "rules": {
+    "indentation": 2,
+    "color-hex-case": "upper",
+    "selector-class-pattern": "^[a-z][a-zA-Z0-9]+$",
+    "selector-id-pattern": "^[a-z][a-zA-Z0-9]+$"
+  }
+}
