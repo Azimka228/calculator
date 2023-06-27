@@ -28,6 +28,7 @@ export const Calculator = () => {
   const dispatch = useAppDispatch()
 
   const directions = useAppSelector(state => state.filter.directions)
+  const allDirections = useAppSelector(state => state.filter.directionsData)
 
   const giveCategoryDirection = useAppSelector(state => state.filter.giveCategory.direction)
   const giveCategorySelectedItem = useAppSelector(state => state.filter.giveCategory.selectedItem)
@@ -69,12 +70,7 @@ export const Calculator = () => {
   }
 
   const handleSwapDirection = () => {
-    if (
-      receiveCategorySelectedItem &&
-      giveCategorySelectedItem &&
-      giveCategoryInputValue &&
-      receiveCategoryInputValue
-    ) {
+    if (receiveCategorySelectedItem && giveCategorySelectedItem) {
       handleChangeGiveDirection(receiveCategorySelectedItem)
 
       dispatch(setGiveCategorySelectedItem(receiveCategorySelectedItem))
@@ -82,7 +78,9 @@ export const Calculator = () => {
 
       dispatch(setReceiveCategoryDirection("Все"))
       dispatch(setGiveCategoryDirection("Все"))
+    }
 
+    if (giveCategoryInputValue && receiveCategoryInputValue) {
       dispatch(setReceiveCategoryInputValue(giveCategoryInputValue))
       dispatch(setGiveCategoryInputValue(receiveCategoryInputValue))
     }
@@ -109,6 +107,7 @@ export const Calculator = () => {
   return (
     <div className={styles.main}>
       <Categories
+        allDirections={allDirections}
         selectedCurrency={giveCategorySelectedItem}
         directions={directions}
         filterCategoryItems={directionsItems}
@@ -128,6 +127,7 @@ export const Calculator = () => {
         ⇅ - Поменять местами
       </button>
       <Categories
+        allDirections={allDirections}
         selectedCurrency={receiveCategorySelectedItem}
         directions={directions}
         inputValue={receiveCategoryInputValue}

@@ -7,11 +7,12 @@ import {SelectItem} from "@app/shared/ui/Select"
 
 interface CategoriesProps {
   title: string
-  filterCategoryItems?: SelectItem[]
-  selectedCurrency?: SelectItem
   directions: string[]
+  allDirections: SelectItem[]
   currentDirection?: string
   inputValue?: string
+  filterCategoryItems?: SelectItem[]
+  selectedCurrency?: SelectItem
   onChangeCurrentDirection?: (value: string) => void
   onChangeSelectedDirection?: (value: SelectItem) => void
   onChangeInputValue?: (value: string) => void
@@ -20,7 +21,6 @@ interface CategoriesProps {
 type CurrenciesInCategoryType = Record<string, string[]>
 
 const currenciesInCategory: CurrenciesInCategoryType = {
-  Все: [],
   Криптовалюты: ["BTC", "ETH", "USDTTRC"],
   Банки: ["ACRUB", "SBERRUB", "TCSBRUB"],
   Наличные: ["CASHUSD", "CASHRUB"],
@@ -31,6 +31,7 @@ export const Categories: FC<CategoriesProps> = ({
   inputValue,
   onChangeInputValue,
   directions,
+  allDirections,
   filterCategoryItems,
   selectedCurrency,
   onChangeSelectedDirection,
@@ -39,11 +40,17 @@ export const Categories: FC<CategoriesProps> = ({
 }) => {
   const [currentFilterCategoryItems, setCurrentFilterCategoryItems] = useState<SelectItem[]>()
 
+  const allDirectionsFormatted = allDirections.map(el => el.code)
+
   const handleSelectedDirectionChange = (value: string) => {
-    const newSelectedDirections = filterCategoryItems?.filter(
-      currency =>
-        value === "Все" || currenciesInCategory[value as keyof CurrenciesInCategoryType].includes(currency.code)
-    )
+    const newSelectedDirections = filterCategoryItems?.filter(currency => {
+      if (value === "Все") {
+        return allDirectionsFormatted.includes(currency.code)
+      }
+      return currenciesInCategory[value as keyof CurrenciesInCategoryType].includes(
+        currency.code as keyof typeof currenciesInCategory
+      )
+    })
     setCurrentFilterCategoryItems(newSelectedDirections ?? [])
     if (onChangeCurrentDirection) {
       onChangeCurrentDirection(value)
@@ -64,9 +71,13 @@ export const Categories: FC<CategoriesProps> = ({
 
   useEffect(() => {
     if (filterCategoryItems) {
-      setCurrentFilterCategoryItems(filterCategoryItems)
+      const newFilteredCategoryItems = filterCategoryItems?.filter(currency =>
+        allDirectionsFormatted.includes(currency.code)
+      )
+
+      setCurrentFilterCategoryItems(newFilteredCategoryItems)
     }
-  }, [filterCategoryItems])
+  }, [filterCategoryItems, allDirections])
 
   const [currentInputValue, setCurrentInputValue] = useState<string>("")
   const handleChangeInputValue = (e: ChangeEvent<HTMLInputElement>) => {
