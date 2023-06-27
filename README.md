@@ -11,11 +11,6 @@
 
 Частична взята отсюда - [Feature-Sliced Design](https://feature-sliced.design/)
 
-
-## Ссылка на demo version
-
-[ТЫК](https://calculator-khaki-gamma.vercel.app/)
-
 ## Главные технологии на проекте
 
 <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />\
