@@ -13,12 +13,16 @@ import {
   fetchDirectionsData,
   fetchFilterData,
   setGiveCategoryDirection,
+  setGiveCategoryInputValue,
   setGiveCategorySelectedItem,
   setReceiveCategoryDirection,
+  setReceiveCategoryInputValue,
   setReceiveCategoryItems,
   setReceiveCategorySelectedItem,
 } from "@app/store/slices/filterSlice"
 import type {DirectionType} from "@app/store/slices/filterSlice"
+
+const CURRENCY_COEFFICIENT = 1.3
 
 export const Calculator = () => {
   const dispatch = useAppDispatch()
@@ -27,10 +31,12 @@ export const Calculator = () => {
 
   const giveCategoryDirection = useAppSelector(state => state.filter.giveCategory.direction)
   const giveCategorySelectedItem = useAppSelector(state => state.filter.giveCategory.selectedItem)
+  const giveCategoryInputValue = useAppSelector(state => state.filter.giveCategory.inputValue)
 
   const receiveCategoryDirection = useAppSelector(state => state.filter.receiveCategory.direction)
   const receiveCategorySelectedItem = useAppSelector(state => state.filter.receiveCategory.selectedItem)
   const receiveCategoryItems = useAppSelector(state => state.filter.receiveCategory.items)
+  const receiveCategoryInputValue = useAppSelector(state => state.filter.receiveCategory.inputValue)
 
   const handleChangeGiveDirection = (value: SelectItem) => {
     const currentObj = filterItems.find(el => isObjectEqual(el.from, value))
@@ -63,7 +69,12 @@ export const Calculator = () => {
   }
 
   const handleSwapDirection = () => {
-    if (receiveCategorySelectedItem && giveCategorySelectedItem) {
+    if (
+      receiveCategorySelectedItem &&
+      giveCategorySelectedItem &&
+      giveCategoryInputValue &&
+      receiveCategoryInputValue
+    ) {
       handleChangeGiveDirection(receiveCategorySelectedItem)
 
       dispatch(setGiveCategorySelectedItem(receiveCategorySelectedItem))
@@ -71,6 +82,9 @@ export const Calculator = () => {
 
       dispatch(setReceiveCategoryDirection("Все"))
       dispatch(setGiveCategoryDirection("Все"))
+
+      dispatch(setReceiveCategoryInputValue(giveCategoryInputValue))
+      dispatch(setGiveCategoryInputValue(receiveCategoryInputValue))
     }
   }
 
@@ -79,6 +93,19 @@ export const Calculator = () => {
     dispatch(fetchDirectionsData())
   }, [dispatch])
 
+  const handleChangeGiveInputValue = (value: string) => {
+    const convertedValue = String((Number(value) * CURRENCY_COEFFICIENT).toFixed(2))
+
+    dispatch(setGiveCategoryInputValue(value))
+    dispatch(setReceiveCategoryInputValue(convertedValue))
+  }
+  const handleChangeReceiveInputValue = (value: string) => {
+    const convertedValue = String((Number(value) / CURRENCY_COEFFICIENT).toFixed(2))
+
+    dispatch(setReceiveCategoryInputValue(value))
+    dispatch(setGiveCategoryInputValue(convertedValue))
+  }
+
   return (
     <div className={styles.main}>
       <Categories
@@ -86,7 +113,9 @@ export const Calculator = () => {
         directions={directions}
         filterCategoryItems={directionsItems}
         currentDirection={giveCategoryDirection}
+        inputValue={giveCategoryInputValue}
         title="Отдаёте"
+        onChangeInputValue={handleChangeGiveInputValue}
         onChangeSelectedDirection={handleChangeGiveDirection}
         onChangeCurrentDirection={handleChangeGiveCategoryDirection}
       />
@@ -101,8 +130,10 @@ export const Calculator = () => {
       <Categories
         selectedCurrency={receiveCategorySelectedItem}
         directions={directions}
+        inputValue={receiveCategoryInputValue}
         currentDirection={receiveCategoryDirection}
         filterCategoryItems={receiveCategoryItems}
+        onChangeInputValue={handleChangeReceiveInputValue}
         onChangeSelectedDirection={handleChangeReceiveDirection}
         onChangeCurrentDirection={handleChangeReceiveCategoryDirection}
         title="Получаете"

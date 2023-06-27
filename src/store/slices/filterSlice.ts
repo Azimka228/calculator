@@ -18,39 +18,27 @@ interface IFilter {
   giveCategory: {
     direction?: DirectionType
     selectedItem?: SelectItem
+    inputValue?: string
   }
   receiveCategory: {
     direction?: DirectionType
     selectedItem?: SelectItem
     items?: SelectItem[]
+    inputValue?: string
   }
 }
 
-interface FetchFilterDataPayload {
-  data: FilterDataItem[]
-}
+export const fetchFilterData = createAsyncThunk("filter/fetchFilterData", async () => {
+  const response = await fetch("/src/assets/filter.json")
+  const data: FilterDataItem[] = await response.json()
+  return {data}
+})
 
-interface fetchDirectionsDataPayload {
-  data: SelectItem[]
-}
-
-export const fetchFilterData = createAsyncThunk<FetchFilterDataPayload, void, {}>(
-  "filter/fetchFilterData",
-  async () => {
-    const response = await fetch("/src/assets/filter.json")
-    const data: FilterDataItem[] = await response.json()
-    return {data}
-  }
-)
-
-export const fetchDirectionsData = createAsyncThunk<fetchDirectionsDataPayload, void, {}>(
-  "filter/fetchDirectionsData",
-  async () => {
-    const response = await fetch("/src/assets/directions.json")
-    const data: SelectItem[] = await response.json()
-    return {data}
-  }
-)
+export const fetchDirectionsData = createAsyncThunk("filter/fetchDirectionsData", async () => {
+  const response = await fetch("/src/assets/directions.json")
+  const data: SelectItem[] = await response.json()
+  return {data}
+})
 
 const initialState: IFilter = {
   filterData: [],
@@ -60,9 +48,11 @@ const initialState: IFilter = {
   error: null,
   giveCategory: {
     direction: "Все",
+    inputValue: "",
   },
   receiveCategory: {
     direction: "Все",
+    inputValue: "",
   },
 }
 
@@ -70,45 +60,51 @@ export const filterSlice = createSlice({
   name: "filter",
   initialState,
   reducers: {
-    setGiveCategoryDirection: (state: IFilter, action: PayloadAction<DirectionType>) => {
+    setGiveCategoryDirection: (state, action: PayloadAction<DirectionType>) => {
       state.giveCategory.direction = action.payload
     },
-    setGiveCategorySelectedItem: (state: IFilter, action: PayloadAction<SelectItem>) => {
+    setGiveCategorySelectedItem: (state, action: PayloadAction<SelectItem>) => {
       state.giveCategory.selectedItem = action.payload
     },
-    setReceiveCategoryDirection: (state: IFilter, action: PayloadAction<DirectionType>) => {
+    setGiveCategoryInputValue: (state, action: PayloadAction<string>) => {
+      state.giveCategory.inputValue = action.payload
+    },
+    setReceiveCategoryDirection: (state, action: PayloadAction<DirectionType>) => {
       state.receiveCategory.direction = action.payload
     },
-    setReceiveCategorySelectedItem: (state: IFilter, action: PayloadAction<SelectItem>) => {
+    setReceiveCategorySelectedItem: (state, action: PayloadAction<SelectItem>) => {
       state.receiveCategory.selectedItem = action.payload
     },
-    setReceiveCategoryItems: (state: IFilter, action: PayloadAction<SelectItem[]>) => {
+    setReceiveCategoryItems: (state, action: PayloadAction<SelectItem[]>) => {
       state.receiveCategory.items = action.payload
+    },
+    setReceiveCategoryInputValue: (state, action: PayloadAction<string>) => {
+      state.receiveCategory.inputValue = action.payload
     },
   },
   extraReducers: builder => {
     builder
-      .addCase(fetchFilterData.pending, (state: IFilter) => {
+      .addCase(fetchFilterData.pending, state => {
         state.status = "loading"
         state.error = null
       })
-      .addCase(fetchFilterData.fulfilled, (state: IFilter, action) => {
+      .addCase(fetchFilterData.fulfilled, (state, action) => {
         state.status = "succeeded"
         state.filterData = action.payload.data
       })
-      .addCase(fetchFilterData.rejected, (state: IFilter) => {
+      .addCase(fetchFilterData.rejected, state => {
         state.status = "failed"
         state.error = "fetch Filter Error"
       })
-      .addCase(fetchDirectionsData.pending, (state: IFilter) => {
+      .addCase(fetchDirectionsData.pending, state => {
         state.status = "loading"
         state.error = null
       })
-      .addCase(fetchDirectionsData.fulfilled, (state: IFilter, action) => {
+      .addCase(fetchDirectionsData.fulfilled, (state, action) => {
         state.status = "succeeded"
         state.directionsData = action.payload.data
       })
-      .addCase(fetchDirectionsData.rejected, (state: IFilter) => {
+      .addCase(fetchDirectionsData.rejected, state => {
         state.status = "failed"
         state.error = "fetch Directions Error"
       })
@@ -117,10 +113,12 @@ export const filterSlice = createSlice({
 
 export const {
   setGiveCategoryDirection,
-  setReceiveCategoryDirection,
   setGiveCategorySelectedItem,
+  setGiveCategoryInputValue,
+  setReceiveCategoryDirection,
   setReceiveCategorySelectedItem,
   setReceiveCategoryItems,
+  setReceiveCategoryInputValue,
 } = filterSlice.actions
 
 export default filterSlice

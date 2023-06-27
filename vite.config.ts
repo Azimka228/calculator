@@ -11,4 +11,10 @@ export default defineConfig({
       "@app": path.resolve(__dirname, "src"),
     },
   },
+  css: {
+    modules: {
+      localsConvention: "dashes",
+      generateScopedName: "[name]__[local]___[hash:base64:5]",
+    },
+  },
 })
