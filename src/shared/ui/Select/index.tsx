@@ -7,19 +7,19 @@ import cn from "classnames"
 import {useOutsideClick} from "@app/shared/hooks"
 import {isObjectEqual} from "@app/shared/lib"
 
-export interface selectItem {
+export interface SelectItem {
   code: string
   name: string
 }
 
 interface SelectProps {
-  data: selectItem[]
-  onChange?: (value: selectItem) => void
-  defaultValue?: selectItem
+  data?: SelectItem[]
+  onChange?: (value: SelectItem) => void
+  defaultValue?: SelectItem
 }
 
 export const Select: FC<SelectProps> = ({data, onChange, defaultValue}) => {
-  const [selected, setSelected] = useState<selectItem>(data[0])
+  const [selected, setSelected] = useState<SelectItem>()
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -29,7 +29,7 @@ export const Select: FC<SelectProps> = ({data, onChange, defaultValue}) => {
     }
   }, [defaultValue])
 
-  const mappedItems = data.map((el, index) => {
+  const mappedItems = data?.map((el, index) => {
     const handleClickItem = () => {
       if (onChange) {
         onChange(el)
@@ -39,7 +39,7 @@ export const Select: FC<SelectProps> = ({data, onChange, defaultValue}) => {
     }
 
     const mainClasses = cn(styles.item, {
-      [styles.active]: isObjectEqual(el, selected),
+      [styles.active]: selected && isObjectEqual(el, selected),
     })
 
     return (
@@ -62,9 +62,9 @@ export const Select: FC<SelectProps> = ({data, onChange, defaultValue}) => {
   useOutsideClick(mainRef, handleCloseMenu)
   return (
     <div className={styles.main} ref={mainRef}>
-      <button type="button" onClick={handleClickHeader} className={styles.header} disabled={data.length === 0}>
-        {selected?.name || "Выбрать"}
-        {isOpen ? "▲" : " ▼ "}
+      <button type="button" onClick={handleClickHeader} className={styles.header} disabled={data?.length === 0}>
+        <div>{selected?.name || "Выбрать"}</div>
+        <div>{isOpen ? "▲" : " ▼ "}</div>
       </button>
       {isOpen && <div className={styles.cards}>{mappedItems}</div>}
     </div>

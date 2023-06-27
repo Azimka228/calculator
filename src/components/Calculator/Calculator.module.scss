@@ -4,4 +4,26 @@
   gap: 50px;
   align-items: center;
   justify-content: center;
+
+  width: max-content;
+
+  > .swapButton {
+    cursor: pointer;
+
+    max-width: 200px;
+    padding: 8px;
+
+    color: white;
+
+    background-color: #F13E3E;
+    border: none;
+    border-radius: 4px;
+
+    transition: opacity .5s ease;
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
 }

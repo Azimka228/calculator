@@ -3,22 +3,22 @@ import styles from "./Categories.module.scss"
 import {FC, useEffect, useState} from "react"
 
 import {Input, RadioSelect, Select} from "@app/shared/ui"
-import {selectItem} from "@app/shared/ui/Select"
+import {SelectItem} from "@app/shared/ui/Select"
 
 interface CategoriesProps {
   title: string
-  filterCategoryItems: selectItem[]
-  selectedCurrency?: selectItem
+  filterCategoryItems?: SelectItem[]
+  selectedCurrency?: SelectItem
   directions: string[]
   currentDirection?: string
   onChangeCurrentDirection?: (value: string) => void
-  onChangeSelectedDirection?: (value: selectItem) => void
+  onChangeSelectedDirection?: (value: SelectItem) => void
 }
 
 type CurrenciesInCategoryType = Record<string, string[]>
 
 const currenciesInCategory: CurrenciesInCategoryType = {
-  Все: ["BTC", "ETH", "CASHUSD", "CASHRUB", "ACRUB", "SBERRUB", "TCSBRUB", "USDTTRC"],
+  Все: [],
   Криптовалюты: ["BTC", "ETH", "USDTTRC"],
   Банки: ["ACRUB", "SBERRUB", "TCSBRUB"],
   Наличные: ["CASHUSD", "CASHRUB"],
@@ -33,19 +33,20 @@ export const Categories: FC<CategoriesProps> = ({
   currentDirection,
   onChangeCurrentDirection,
 }) => {
-  const [currentFilterCategoryItems, setCurrentFilterCategoryItems] = useState<selectItem[]>(filterCategoryItems)
+  const [currentFilterCategoryItems, setCurrentFilterCategoryItems] = useState<SelectItem[]>()
 
-  const handleChangeSelectedDirections = (value: string) => {
-    const newSelectedDirections = filterCategoryItems.filter(currency =>
-      currenciesInCategory[value as keyof CurrenciesInCategoryType].includes(currency.code)
+  const handleSelectedDirectionChange = (value: string) => {
+    const newSelectedDirections = filterCategoryItems?.filter(
+      currency =>
+        value === "Все" || currenciesInCategory[value as keyof CurrenciesInCategoryType].includes(currency.code)
     )
-    setCurrentFilterCategoryItems(newSelectedDirections)
+    setCurrentFilterCategoryItems(newSelectedDirections ?? [])
     if (onChangeCurrentDirection) {
       onChangeCurrentDirection(value)
     }
   }
 
-  const handleChangeSelectedFilter = (value: selectItem) => {
+  const handleChangeSelectedFilter = (value: SelectItem) => {
     if (onChangeSelectedDirection) {
       onChangeSelectedDirection(value)
     }
@@ -53,20 +54,22 @@ export const Categories: FC<CategoriesProps> = ({
 
   useEffect(() => {
     if (currentDirection) {
-      handleChangeSelectedDirections(currentDirection)
+      handleSelectedDirectionChange(currentDirection)
     }
   }, [currentDirection])
 
   useEffect(() => {
-    setCurrentFilterCategoryItems(filterCategoryItems)
+    if (filterCategoryItems) {
+      setCurrentFilterCategoryItems(filterCategoryItems)
+    }
   }, [filterCategoryItems])
 
   return (
     <div className={styles.main}>
       <span className={styles.title}>{title}</span>
-      <RadioSelect data={directions} onChange={handleChangeSelectedDirections} defaultValue={currentDirection} />
+      <RadioSelect data={directions} onChange={handleSelectedDirectionChange} defaultValue={currentDirection} />
       <div className={styles.categories}>
-        <Input type="number" />
+        <Input type="number" placeholder="0 - 999999" />
         <Select
           data={currentFilterCategoryItems}
           onChange={handleChangeSelectedFilter}

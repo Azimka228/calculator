@@ -10,8 +10,10 @@
       "@app/*": ["./src/*"]
     },
 
+
+    "esModuleInterop": true,
+    "moduleResolution": "node",
     /* Bundler mode */
-    "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,

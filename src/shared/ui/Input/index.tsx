@@ -10,6 +10,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input: FC<InputProps> = memo(({className, ...rest}) => {
   const mainClasses = cn(className, styles.main)
+
   return <input {...rest} className={mainClasses} />
 })
 

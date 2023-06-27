@@ -1,63 +1,83 @@
 import styles from "./Calculator.module.scss"
 
-import {useState} from "react"
+import {useEffect, useState} from "react"
 
 import {Categories} from "../Categories/index"
 
 import directionsItems from "@app/assets/directions.json"
 import filterItems from "@app/assets/filter.json"
 import {isObjectEqual} from "@app/shared/lib"
-import {selectItem} from "@app/shared/ui/Select"
-
-const directions: string[] = ["Все", "Криптовалюты", "Банки", "Наличные"]
+import {SelectItem} from "@app/shared/ui/Select"
+import {useAppDispatch, useAppSelector} from "@app/store/hooks"
+import {
+  fetchDirectionsData,
+  fetchFilterData,
+  setGiveCategoryDirection,
+  setGiveCategorySelectedItem,
+  setReceiveCategoryDirection,
+  setReceiveCategoryItems,
+  setReceiveCategorySelectedItem,
+} from "@app/store/slices/filterSlice"
+import type {DirectionType} from "@app/store/slices/filterSlice"
 
 export const Calculator = () => {
-  const [giveCategorySelectedItem, setGiveCategorySelectedItem] = useState<selectItem>()
-  const [giveCategoryDirection, setGiveCategoryDirection] = useState<string>(directions[0])
+  const dispatch = useAppDispatch()
 
-  const [receiveCategoryItems, setReceiveCategoryItems] = useState<selectItem[]>(directionsItems)
-  const [receiveCategoryDirection, setReceiveCategoryDirection] = useState<string>(directions[0])
-  const [receiveCategorySelectedItem, setReceiveCategorySelectedItem] = useState<selectItem>()
+  const directions = useAppSelector(state => state.filter.directions)
 
-  const handleChangeGiveDirection = (value: selectItem) => {
+  const giveCategoryDirection = useAppSelector(state => state.filter.giveCategory.direction)
+  const giveCategorySelectedItem = useAppSelector(state => state.filter.giveCategory.selectedItem)
+
+  const receiveCategoryDirection = useAppSelector(state => state.filter.receiveCategory.direction)
+  const receiveCategorySelectedItem = useAppSelector(state => state.filter.receiveCategory.selectedItem)
+  const receiveCategoryItems = useAppSelector(state => state.filter.receiveCategory.items)
+
+  const handleChangeGiveDirection = (value: SelectItem) => {
     const currentObj = filterItems.find(el => isObjectEqual(el.from, value))
 
     if (currentObj) {
-      setReceiveCategoryItems(currentObj.to)
+      dispatch(setReceiveCategoryItems(currentObj.to))
     }
 
-    setReceiveCategoryDirection("Все")
-    setGiveCategorySelectedItem(value)
+    dispatch(setReceiveCategoryDirection("Все"))
+    dispatch(setGiveCategorySelectedItem(value))
   }
 
   const [disalbedChangeDirectionButton, setDisabledChangeDirectionButton] = useState(true)
 
-  const handleChangeReceiveDirection = (value: selectItem) => {
+  const handleChangeReceiveDirection = (value: SelectItem) => {
     const currentObj = filterItems.find(el => isObjectEqual(el.from, value))
     if (currentObj) {
       setDisabledChangeDirectionButton(false)
     } else {
       setDisabledChangeDirectionButton(true)
     }
-    setReceiveCategorySelectedItem(value)
+    dispatch(setReceiveCategorySelectedItem(value))
   }
 
   const handleChangeReceiveCategoryDirection = (value: string) => {
-    setReceiveCategoryDirection(value)
+    dispatch(setReceiveCategoryDirection(value as DirectionType))
   }
   const handleChangeGiveCategoryDirection = (value: string) => {
-    setGiveCategoryDirection(value)
+    dispatch(setGiveCategoryDirection(value as DirectionType))
   }
 
   const handleSwapDirection = () => {
-    if (receiveCategorySelectedItem) {
-      setGiveCategorySelectedItem(receiveCategorySelectedItem)
+    if (receiveCategorySelectedItem && giveCategorySelectedItem) {
       handleChangeGiveDirection(receiveCategorySelectedItem)
-      setReceiveCategorySelectedItem(giveCategorySelectedItem)
-      setReceiveCategoryDirection("Все")
-      setGiveCategoryDirection("Все")
+
+      dispatch(setGiveCategorySelectedItem(receiveCategorySelectedItem))
+      dispatch(setReceiveCategorySelectedItem(giveCategorySelectedItem))
+
+      dispatch(setReceiveCategoryDirection("Все"))
+      dispatch(setGiveCategoryDirection("Все"))
     }
   }
+
+  useEffect(() => {
+    dispatch(fetchFilterData())
+    dispatch(fetchDirectionsData())
+  }, [dispatch])
 
   return (
     <div className={styles.main}>
@@ -70,7 +90,12 @@ export const Calculator = () => {
         onChangeSelectedDirection={handleChangeGiveDirection}
         onChangeCurrentDirection={handleChangeGiveCategoryDirection}
       />
-      <button type="button" onClick={handleSwapDirection} disabled={disalbedChangeDirectionButton}>
+      <button
+        type="button"
+        onClick={handleSwapDirection}
+        disabled={disalbedChangeDirectionButton}
+        className={styles.swapButton}
+      >
         ⇅ - Поменять местами
       </button>
       <Categories

@@ -8,7 +8,13 @@
 
     position: relative;
 
-    width: 100%;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+
+    width: max-content;
+    min-width: 100px;
     padding: 10px;
 
     background: transparent;
@@ -45,6 +51,7 @@
       padding: 10px;
 
       color: black;
+      word-break: break-word;
 
       background: white;
       border: unset;
